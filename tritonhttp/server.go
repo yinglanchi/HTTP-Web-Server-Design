@@ -70,7 +70,6 @@ func (s *Server) handleConn(conn net.Conn) {
 			// if nothing read in, close the connection and return
 			if !readIn {
 				conn.Close()
-				req.Close = true
 				return
 			}
 			// else if only partial request is being processed, return 400 error
@@ -174,7 +173,6 @@ func (s *Server) handle404Requests(req *Request) (res *Response) {
 	res.StatusText = "Not Found"
 	res.Headers = make(map[string]string)
 	res.Headers["Date"] = time.Now().Format("Tue, 19 Oct 2021 18:12:55 GMT")
-	res.Headers["Connection"] = "close"
 	res.Request = req
 	res.FilePath = ""
 	return res
