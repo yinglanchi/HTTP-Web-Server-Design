@@ -75,7 +75,6 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
-			req.Close = true
 			return
 		}
 
@@ -84,7 +83,6 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
-			req.Close = true
 			return
 		}
 
@@ -96,7 +94,6 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
-			req.Close = true
 			return
 		}
 		absolutePath := filepath.Join(docRoot, filepath.Clean(req.URL))
@@ -104,7 +101,6 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
-			req.Close = true
 			return
 		}
 
@@ -113,7 +109,6 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
-			req.Close = true
 			return
 		}
 
@@ -129,6 +124,7 @@ func (s *Server) handleConn(conn net.Conn) {
 }
 
 func (s *Server) handle400Requests(req *Request) (res *Response) {
+	req.Close = true
 	res = &Response{}
 	res.Proto = "HTTP/1.1"
 	res.StatusCode = 400
@@ -168,6 +164,7 @@ func (s *Server) handle200Requests(req *Request) (res *Response) {
 }
 
 func (s *Server) handle404Requests(req *Request) (res *Response) {
+	req.Close = true
 	res = &Response{}
 	res.Proto = "HTTP/1.1"
 	res.StatusCode = 404
