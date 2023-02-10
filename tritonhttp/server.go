@@ -93,11 +93,13 @@ func (s *Server) handleConn(conn net.Conn) {
 		if docRoot == "" {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
+			continue
 		}
 		absolutePath := filepath.Join(docRoot, filepath.Clean(req.URL))
 		if absolutePath[:len(docRoot)] != docRoot {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
+			continue
 		}
 
 		_, err = os.Stat(absolutePath)
@@ -105,6 +107,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			fmt.Println(err)
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
+			continue
 		}
 
 		// else, 200 ok
