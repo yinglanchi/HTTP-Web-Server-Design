@@ -2,11 +2,9 @@ package tritonhttp
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"mime"
 	"net"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -70,6 +68,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			// if nothing read in, close the connection and return
 			if !readIn {
 				conn.Close()
+				req.Close = true
 				return
 			}
 			// else if only partial request is being processed, return 400 error
@@ -153,8 +152,6 @@ func (s *Server) handle200Requests(req *Request) (res *Response) {
 		log.Println(err)
 	}
 	res.Headers["Content-Type"] = mime.TypeByExtension(filepath.Ext(absolutePath))
-	fmt.Println(res.Headers["Content-Type"])
-	fmt.Println(res.Headers["Content-Type"])
 	fi, _ := file.Stat()
 	res.Headers["Content-Length"] = strconv.FormatInt(fi.Size(), 10)
 	file.Close()
@@ -176,23 +173,4 @@ func (s *Server) handle404Requests(req *Request) (res *Response) {
 	res.Request = req
 	res.FilePath = ""
 	return res
-}
-
-func GetFileContentType(ouput *os.File) (string, error) {
-
-	// to sniff the content type only the first
-	// 512 bytes are used.
-
-	buf := make([]byte, 512)
-
-	_, err := ouput.Read(buf)
-
-	if err != nil {
-		return "", err
-	}
-
-	// the function that actually does the trick
-	contentType := http.DetectContentType(buf)
-
-	return contentType, nil
 }
