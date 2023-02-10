@@ -91,7 +91,7 @@ func (s *Server) handleConn(conn net.Conn) {
 		hostName := req.Host
 		docRoot := s.VirtualHosts[hostName]
 		if docRoot == "" {
-			res := s.handle404Requests(req)
+			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
 			return

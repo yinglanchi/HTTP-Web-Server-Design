@@ -305,3 +305,31 @@ func TestAllFilesInHtdocs(t *testing.T) {
 	}
 
 }
+
+func TestNotFound(t *testing.T) {
+	launchhttpd(t)
+
+	req := fmt.Sprintf("GET / HTTP/1.1\r\n" +
+		"Host: website4\r\n" +
+		"Connection: close\r\n" +
+		"User-Agent: gotest\r\n" +
+		"\r\n")
+
+	respbytes, _, err := tritonhttp.Fetch("localhost", "8080", []byte(req))
+	if err != nil {
+		t.Fatalf("Error fetching request: %v\n", err.Error())
+	}
+
+	resp, err := http.ReadResponse(bufio.NewReader(bytes.NewReader(respbytes)), nil)
+	if err != nil {
+		t.Fatalf("got an error parsing the response: %v\n", err.Error())
+	}
+
+	if resp.Proto != "HTTP/1.1" {
+		t.Fatalf("Expected HTTP/1.1 but got a version: %v\n", resp.Proto)
+	}
+
+	if resp.StatusCode != 400 {
+		t.Fatalf("Expected response code of 400 but got: %v\n", resp.StatusCode)
+	}
+}
