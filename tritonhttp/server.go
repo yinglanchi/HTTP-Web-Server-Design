@@ -124,7 +124,6 @@ func (s *Server) handleConn(conn net.Conn) {
 }
 
 func (s *Server) handle400Requests(req *Request) (res *Response) {
-	req.Close = true
 	res = &Response{}
 	res.Proto = "HTTP/1.1"
 	res.StatusCode = 400
@@ -147,14 +146,12 @@ func (s *Server) handle200Requests(req *Request) (res *Response) {
 	absolutePath := filepath.Join(s.VirtualHosts[req.Host], filepath.Clean(req.URL))
 	f, _ := os.Stat(absolutePath)
 	res.Headers["Last-Modified"] = f.ModTime().Format("Tue, 19 Oct 2021 18:12:55 GMT")
-	file, err := os.Open(absolutePath)
-	if err != nil {
-		log.Println(err)
-	}
 	res.Headers["Content-Type"] = mime.TypeByExtension(filepath.Ext(absolutePath))
-	fi, _ := file.Stat()
+	fi, err := os.Stat(absolutePath)
+	if err != nil {
+		log.Fatal(err)
+	}
 	res.Headers["Content-Length"] = strconv.FormatInt(fi.Size(), 10)
-	file.Close()
 	if req.Close {
 		res.Headers["Connection"] = "close"
 	}
@@ -164,7 +161,6 @@ func (s *Server) handle200Requests(req *Request) (res *Response) {
 }
 
 func (s *Server) handle404Requests(req *Request) (res *Response) {
-	req.Close = true
 	res = &Response{}
 	res.Proto = "HTTP/1.1"
 	res.StatusCode = 404
