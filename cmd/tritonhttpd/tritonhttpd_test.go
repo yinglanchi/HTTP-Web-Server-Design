@@ -309,8 +309,8 @@ func TestAllFilesInHtdocs(t *testing.T) {
 func TestNotFound(t *testing.T) {
 	launchhttpd(t)
 
-	req := fmt.Sprintf("GET / HTTP/1.1\r\n" +
-		"Host: website4\r\n" +
+	req := fmt.Sprintf("GET /hello.txt HTTP/1.1\r\n" +
+		"Host: website1\r\n" +
 		"Connection: close\r\n" +
 		"User-Agent: gotest\r\n" +
 		"\r\n")

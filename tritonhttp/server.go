@@ -106,7 +106,7 @@ func (s *Server) handleConn(conn net.Conn) {
 
 		_, err = os.Stat(absolutePath)
 		if err != nil {
-			res := s.handle404Requests(req)
+			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
 			return
