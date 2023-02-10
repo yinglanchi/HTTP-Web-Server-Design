@@ -75,6 +75,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
+			req.Close = true
 			return
 		}
 
@@ -83,6 +84,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
+			req.Close = true
 			return
 		}
 
@@ -94,6 +96,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
+			req.Close = true
 			return
 		}
 		absolutePath := filepath.Join(docRoot, filepath.Clean(req.URL))
@@ -101,6 +104,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
+			req.Close = true
 			return
 		}
 
@@ -109,6 +113,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
+			req.Close = true
 			return
 		}
 
@@ -170,7 +175,6 @@ func (s *Server) handle404Requests(req *Request) (res *Response) {
 	res.Headers = make(map[string]string)
 	res.Headers["Date"] = time.Now().Format("Tue, 19 Oct 2021 18:12:55 GMT")
 	res.Request = req
-	req.Close = true
 	res.FilePath = ""
 	return res
 }
