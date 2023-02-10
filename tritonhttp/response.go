@@ -41,7 +41,7 @@ func (res *Response) WriteResponse(w io.Writer) error {
 	// sort the keys when writing for the convenience when testing
 	SortedKeys := make([]string, 0, len(res.Headers))
 
-	for key, _ := range res.Headers {
+	for key := range res.Headers {
 		SortedKeys = append(SortedKeys, key)
 	}
 	sort.Strings(SortedKeys)

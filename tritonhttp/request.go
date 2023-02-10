@@ -26,7 +26,6 @@ func ReadRequest(reader *bufio.Reader) (req *Request, readIn bool, err error) {
 
 	// read initial request line
 	request, _, err := reader.ReadLine()
-	fmt.Println(string(request))
 	if err != nil {
 		log.Println("read request line error: ", err)
 		return nil, false, err
@@ -35,7 +34,7 @@ func ReadRequest(reader *bufio.Reader) (req *Request, readIn bool, err error) {
 	requestFields := strings.Split(string(request), " ")
 	// check for incorrect request line formats
 	// if format incorrect, return 400 error
-	if len(requestFields) < 3 {
+	if len(requestFields) != 3 {
 		log.Println("incorrect request line format")
 		req.Method = ""
 		req.URL = ""
@@ -57,6 +56,10 @@ func ReadRequest(reader *bufio.Reader) (req *Request, readIn bool, err error) {
 
 	if req.Proto != "HTTP/1.1" {
 		return nil, true, fmt.Errorf("400")
+	}
+
+	if req.URL == "/" {
+		req.URL = "/index.html"
 	}
 
 	// start reading in body of the request file

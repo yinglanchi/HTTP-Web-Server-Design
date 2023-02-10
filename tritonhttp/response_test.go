@@ -5,33 +5,41 @@ import (
 	"testing"
 )
 
-// normal case: check whether the function works in general
-func TestWriteResponse1(t *testing.T) {
+func Test400And404cases(t *testing.T) {
 	var tests = []struct {
 		name string
 		res  *Response
 		want string
 	}{
 		{
-			"OK",
+			"400",
 			&Response{
-				StatusCode: 200,
+				StatusCode: 400,
 				Proto:      "HTTP/1.1",
-				StatusText: "OK",
+				StatusText: "Bad Request",
 				Headers: map[string]string{
-					"Connection": "close",
-					"Date":       "foobar",
-					"Misc":       "hello world",
+					"Date": "testWriteDate",
 				},
 			},
-			"HTTP/1.1 200 OK\r\n" +
-				"Connection: close\r\n" +
-				"Date: foobar\r\n" +
-				"Misc: hello world\r\n" +
+			"HTTP/1.1 400 Bad Request\r\n" +
+				"Date: testWriteDate\r\n" +
+				"\r\n",
+		},
+		{
+			"404",
+			&Response{
+				StatusCode: 404,
+				Proto:      "HTTP/1.1",
+				StatusText: "Not Found",
+				Headers: map[string]string{
+					"Date": "testWriteDate",
+				},
+			},
+			"HTTP/1.1 404 Not Found\r\n" +
+				"Date: testWriteDate\r\n" +
 				"\r\n",
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buffer bytes.Buffer
@@ -46,114 +54,67 @@ func TestWriteResponse1(t *testing.T) {
 	}
 }
 
-// test for canonical conversion of headers
-func TestWriteResponse2(t *testing.T) {
+func Test200Cases(t *testing.T) {
 	var tests = []struct {
 		name string
 		res  *Response
 		want string
 	}{
 		{
-			"OK",
+			"without body file - normal case",
 			&Response{
 				StatusCode: 200,
 				Proto:      "HTTP/1.1",
 				StatusText: "OK",
 				Headers: map[string]string{
 					"Connection":    "close",
-					"date-modified": "foobar",
-					"misc":          "hello world",
+					"Date":          "testWriteDate",
+					"Last-Modified": "testWriteLastModified",
 				},
 			},
 			"HTTP/1.1 200 OK\r\n" +
 				"Connection: close\r\n" +
-				"Date-Modified: foobar\r\n" +
-				"Misc: hello world\r\n" +
+				"Date: testWriteDate\r\n" +
+				"Last-Modified: testWriteLastModified\r\n" +
 				"\r\n",
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var buffer bytes.Buffer
-			if err := tt.res.WriteResponse(&buffer); err != nil {
-				t.Fatal(err)
-			}
-			got := buffer.String()
-			if got != tt.want {
-				t.Fatalf("got: %q, want: %q", got, tt.want)
-			}
-		})
-	}
-}
-
-// test with body file
-func TestWriteResponse3(t *testing.T) {
-	var tests = []struct {
-		name string
-		res  *Response
-		want string
-	}{
 		{
-			"OK",
+			"without body file - canonical string func test",
 			&Response{
 				StatusCode: 200,
 				Proto:      "HTTP/1.1",
 				StatusText: "OK",
 				Headers: map[string]string{
 					"Connection":    "close",
-					"date-modified": "foobar",
-					"misc":          "hello world",
+					"Date":          "testWriteDate",
+					"last-modified": "testWriteLastModified",
 				},
-				FilePath: "index.html",
 			},
 			"HTTP/1.1 200 OK\r\n" +
 				"Connection: close\r\n" +
-				"Date-Modified: foobar\r\n" +
-				"Misc: hello world\r\n" +
+				"Date: testWriteDate\r\n" +
+				"Last-Modified: testWriteLastModified\r\n" +
+				"\r\n",
+		},
+		{
+			"with body file",
+			&Response{
+				StatusCode: 200,
+				Proto:      "HTTP/1.1",
+				StatusText: "OK",
+				Headers: map[string]string{
+					"Connection":    "close",
+					"Date":          "testWriteDate",
+					"last-modified": "testWriteLastModified",
+				},
+				FilePath: "testFiles/index.html",
+			},
+			"HTTP/1.1 200 OK\r\n" +
+				"Connection: close\r\n" +
+				"Date: testWriteDate\r\n" +
+				"Last-Modified: testWriteLastModified\r\n" +
 				"\r\n" +
-				"<html>\n\n<head>\n    <title>Basic index file for website 2</title>\n</head>\n\n<body>\n    <h1>This is a basic index file for website 2</h1>\n    You can use this for testing.\n</body>\n\n</html>\n",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var buffer bytes.Buffer
-			if err := tt.res.WriteResponse(&buffer); err != nil {
-				t.Fatal(err)
-			}
-			got := buffer.String()
-			if got != tt.want {
-				t.Fatalf("got: %q, want: %q", got, tt.want)
-			}
-		})
-	}
-}
-
-// test for empty value
-func TestWriteResponse4(t *testing.T) {
-	var tests = []struct {
-		name string
-		res  *Response
-		want string
-	}{
-		{
-			"OK",
-			&Response{
-				StatusCode: 200,
-				Proto:      "HTTP/1.1",
-				StatusText: "OK",
-				Headers: map[string]string{
-					"Connection": "close",
-					"Date":       "foobar",
-					"Misc":       "",
-				},
-			},
-			"HTTP/1.1 200 OK\r\n" +
-				"Connection: close\r\n" +
-				"Date: foobar\r\n" +
-				"Misc: \r\n" +
-				"\r\n",
+				"test\n",
 		},
 	}
 

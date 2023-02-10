@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"mime"
 	"net"
 	"net/http"
 	"os"
@@ -27,9 +28,8 @@ type Server struct {
 // ListenAndServe listens on the TCP network address s.Addr and then
 // handles requests on incoming connections.
 func (s *Server) ListenAndServe() error {
-	log.Println("test")
 	// Hint: Validate all docRoots
-	fmt.Println("Validating all docRoots...")
+	log.Println("Validating all docRoots...")
 	for _, docRoot := range s.VirtualHosts {
 		f, err := os.Stat(docRoot)
 		if os.IsNotExist(err) {
@@ -41,14 +41,14 @@ func (s *Server) ListenAndServe() error {
 			return err
 		}
 	}
-	fmt.Println("Finish validating all docRoots.")
+	log.Println("Finish validating all docRoots.")
 	// Hint: create your listen socket and spawn off goroutines per incoming client
-	fmt.Printf("Listening on %s ...", s.Addr)
+	log.Println("Start listening...")
 	l, err := net.Listen("tcp", s.Addr)
 	if err != nil {
 		log.Println("listen error: ", err)
 	}
-	fmt.Println("Finish Listening")
+	log.Println("finish listening.")
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -59,7 +59,6 @@ func (s *Server) ListenAndServe() error {
 }
 
 func (s *Server) handleConn(conn net.Conn) {
-	fmt.Println("In handConn function.")
 	reader := bufio.NewReader(conn)
 	for {
 		// timeout 5 seconds
@@ -152,7 +151,9 @@ func (s *Server) handle200Requests(req *Request) (res *Response) {
 	if err != nil {
 		log.Println(err)
 	}
-	res.Headers["Content-Type"], _ = GetFileContentType(file)
+	res.Headers["Content-Type"] = mime.TypeByExtension(filepath.Ext(absolutePath))
+	fmt.Println(res.Headers["Content-Type"])
+	fmt.Println(res.Headers["Content-Type"])
 	fi, _ := file.Stat()
 	res.Headers["Content-Length"] = strconv.FormatInt(fi.Size(), 10)
 	file.Close()
