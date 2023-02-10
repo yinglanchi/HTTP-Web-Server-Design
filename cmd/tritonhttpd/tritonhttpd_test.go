@@ -324,12 +324,13 @@ func TestNotFound(t *testing.T) {
 	if err != nil {
 		t.Fatalf("got an error parsing the response: %v\n", err.Error())
 	}
+	fmt.Println(resp.Request)
 
 	if resp.Proto != "HTTP/1.1" {
 		t.Fatalf("Expected HTTP/1.1 but got a version: %v\n", resp.Proto)
 	}
 
-	if resp.StatusCode != 400 {
+	if resp.StatusCode != 404 {
 		t.Fatalf("Expected response code of 400 but got: %v\n", resp.StatusCode)
 	}
 }

@@ -2,6 +2,7 @@ package tritonhttp
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"mime"
 	"net"
@@ -71,7 +72,6 @@ func (s *Server) handleConn(conn net.Conn) {
 				return
 			}
 			// else if only partial request is being processed, return 400 error
-			//res := &Response{}
 			res := s.handle400Requests(req)
 			res.WriteResponse(conn)
 			conn.Close()
@@ -91,25 +91,20 @@ func (s *Server) handleConn(conn net.Conn) {
 		hostName := req.Host
 		docRoot := s.VirtualHosts[hostName]
 		if docRoot == "" {
-			res := s.handle400Requests(req)
+			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
-			conn.Close()
-			return
 		}
 		absolutePath := filepath.Join(docRoot, filepath.Clean(req.URL))
 		if absolutePath[:len(docRoot)] != docRoot {
 			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
-			conn.Close()
-			return
 		}
 
 		_, err = os.Stat(absolutePath)
 		if err != nil {
-			res := s.handle400Requests(req)
+			fmt.Println(err)
+			res := s.handle404Requests(req)
 			res.WriteResponse(conn)
-			conn.Close()
-			return
 		}
 
 		// else, 200 ok
