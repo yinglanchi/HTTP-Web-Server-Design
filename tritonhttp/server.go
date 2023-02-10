@@ -70,6 +70,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			// if nothing read in, close the connection and return
 			if !readIn {
 				conn.Close()
+				req.Close = true
 				return
 			}
 			// else if only partial request is being processed, return 400 error
