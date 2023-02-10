@@ -132,6 +132,7 @@ func (s *Server) handle400Requests(req *Request) (res *Response) {
 	res.StatusText = "Bad Request"
 	res.Headers = make(map[string]string)
 	res.Headers["Date"] = time.Now().Format("Tue, 19 Oct 2021 18:12:55 GMT")
+	res.Headers["Connection"] = "close"
 	res.Request = nil
 	res.FilePath = ""
 	return res
@@ -172,6 +173,7 @@ func (s *Server) handle404Requests(req *Request) (res *Response) {
 	res.StatusText = "Not Found"
 	res.Headers = make(map[string]string)
 	res.Headers["Date"] = time.Now().Format("Tue, 19 Oct 2021 18:12:55 GMT")
+	res.Headers["Connection"] = "close"
 	res.Request = req
 	res.FilePath = ""
 	return res
